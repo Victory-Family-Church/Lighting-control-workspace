@@ -1,5 +1,5 @@
 **THIS IS A PLACEHOLDER< AI GEN>
-**`Victory-Family-Church/Lighting-control-workspace`**, aligned with the Node‑RED + OLA + nix‑darwin work you’ve been doing.
+**`Victory-Family-Church/Lighting-control-workspace`**
 
 You can copy‑paste this directly into `README.md` and tweak naming/details later.
 

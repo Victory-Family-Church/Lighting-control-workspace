@@ -1,0 +1,1 @@
+All lights need to share the same address. 

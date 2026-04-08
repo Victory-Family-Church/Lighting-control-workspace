@@ -5,7 +5,7 @@ let
 in
 {
   options.services.nodeRedMidiOla = {
-    enable = lib.mkEnableOption "Node-RED with MIDI + OLA (launchd)";
+    enable = lib.mkEnableOption "Node-RED with MIDI + OLA blocks";
 
     port = lib.mkOption {
       type = lib.types.port;
@@ -33,10 +33,9 @@ in
 
     environment.systemPackages = [
       pkgs.nodejs_20
-      pkgs.nodePackages.node-red
-      pkgs.nodePackages.node-red-contrib-midi
-      pkgs.nodePackages.node-red-contrib-ola
-      pkgs.ola
+      pkgs.nodejs.pkgs.node-red
+      pkgs.nodejs.pkgs.node-red-contrib-midi
+      pkgs.nodejs.pkgs.node-red-contrib-ola
     ];
 
     launchd.daemons.node-red-midi-ola = {

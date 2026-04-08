@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
     darwin.url = "github:lnl7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -13,46 +12,50 @@
     ##########################################################################
     # Overlay: adds Node-RED and contrib nodes to nodePackages
     ##########################################################################
-    overlay = final: prev: {
-      nodePackages = prev.nodePackages // {
+overlay = final: prev: {
+  node-red = prev.buildNpmPackage rec {
+    pname = "node-red";
+    version = "4.1.8";
 
-        node-red = prev.nodePackages.buildNodePackage rec {
-          pname = "node-red";
-          version = "4.1.8";
-
-          src = prev.fetchurl {
-            url =
-              "https://registry.npmjs.org/node-red/-/node-red-${version}.tgz";
-            hash = "sha512-2n9nvkd5ds5jdkyry3c9m6v0djhfz22py89wd2dyz5xm5vmdrp376z2ni8138h0wwy3xg3agxcr62wj90xxhm98ll9gwfykhr704y71";
-          };
-        };
-
-        node-red-contrib-midi =
-          prev.nodePackages.buildNodePackage rec {
-            pname = "node-red-contrib-midi";
-            version = "1.1.2";
-
-            src = prev.fetchurl {
-              url =
-                "https://registry.npmjs.org/node-red-contrib-midi/-/node-red-contrib-midi-${version}.tgz";
-              hash = "sha512-2wrwaj7qln7parcxvicl4nd9bfckhflp11p2d022by1l8dbb2bzcpapqdi8q7lig5wipj440wjar01jnf41vci72vikbb7nzw7n06y3";
-            };
-          };
-
-        node-red-contrib-ola =
-          prev.nodePackages.buildNodePackage rec {
-            pname = "node-red-contrib-ola";
-            version = "0.0.4";
-
-            src = prev.fetchurl {
-              url =
-                "https://registry.npmjs.org/node-red-contrib-ola/-/node-red-contrib-ola-${version}.tgz";
-              hash = "sha512-08889yyv7bjra5gsyknv1vqrwyjmx2xkl4yp226ijp6ns7nfzmzdqvk6m5g3zrgk1jm6qd54ipxqk35lfisxal51cqyqbkbk2c98vlf";
-            };
-          };
-      };
+    src = final.fetchurl {
+      url = "https://registry.npmjs.org/node-red/-/node-red-${version}.tgz";
+      hash = "sha256-t+HPUWiUVTIyrQ1FE5CdBiCm1XIRpIWUgje0dy20Yf4=";
     };
-  in
+
+    npmLock = ./resources/locks/node-red/package-lock.json;
+    npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+
+    dontNpmBuild = true;
+
+    installPhase = ''
+      mkdir -p $out
+      cp -r . $out
+      makeWrapper ${prev.nodejs}/bin/node $out/bin/node-red \
+        --add-flags $out/node_modules/node-red/red.js
+    '';
+  };
+
+  node-red-contrib-midi = prev.buildNpmPackage rec {
+    pname = "node-red-contrib-midi";
+    version = "1.1.2";
+
+    src = final.fetchurl {
+      url = "https://registry.npmjs.org/node-red-contrib-midi/-/node-red-contrib-midi-${version}.tgz";
+      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    };
+  };
+
+  node-red-contrib-ola = prev.buildNpmPackage rec {
+    pname = "node-red-contrib-ola";
+    version = "0.0.4";
+
+    src = final.fetchurl {
+      url = "https://registry.npmjs.org/node-red-contrib-ola/-/node-red-contrib-ola-${version}.tgz";
+      hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    };
+  };
+};
+in
   {
     ##########################################################################
     # Export overlay (optional for advanced users)
@@ -73,13 +76,10 @@
     ##########################################################################
     # devShell: `nix develop`
     ##########################################################################
-    devShells.default =
+    devShells.aarch64-darwin.default =
       let
-        system =
-          builtins.currentSystem or "aarch64-darwin";
-
         pkgs = import nixpkgs {
-          inherit system;
+          system = "aarch64-darwin";
           overlays = [ overlay ];
         };
       in
@@ -87,26 +87,20 @@
         name = "node-red-midi-ola-shell";
 
         packages = [
-          pkgs.nodejs_20
-          pkgs.nodePackages.node-red
-          pkgs.nodePackages.node-red-contrib-midi
-          pkgs.nodePackages.node-red-contrib-ola
-          pkgs.ola
+          pkgs.nodejs
+          pkgs.node-red
+          pkgs.node-red-contrib-midi
+          pkgs.node-red-contrib-ola
         ];
 
         NODE_PATH = pkgs.lib.makeSearchPath "lib/node_modules" [
-          pkgs.nodePackages.node-red
-          pkgs.nodePackages.node-red-contrib-midi
-          pkgs.nodePackages.node-red-contrib-ola
+          pkgs.node-red
+          pkgs.node-red-contrib-midi
+          pkgs.node-red-contrib-ola
         ];
 
         shellHook = ''
           echo "Node-RED dev shell"
-          echo "Run:"
-          echo "  node ${pkgs.nodePackages.node-red}/lib/node_modules/node-red/red.js \\"
-          echo "    --userDir ./node-red-data"
-          echo
-
           export NODE_RED_HOME=$PWD/node-red-data
           mkdir -p "$NODE_RED_HOME"
         '';

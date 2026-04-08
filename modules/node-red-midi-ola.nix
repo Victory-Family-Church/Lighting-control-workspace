@@ -27,41 +27,29 @@ in
   };
 
     launchd.daemons.node-red = {
-      enable = true;
+      launchd.daemons.node-red = {
+        enable = true;
 
-      config = {
-        Label = "org.vfc.node-red";
+        script = ''
+          set -e
+          export NODE_RED_HOME=${cfg.userDir}
 
-        ProgramArguments = [
-          "/bin/sh"
-          "-c"
-          ''
-            set -e
+          mkdir -p "$NODE_RED_HOME"
+          mkdir -p "$NODE_RED_HOME/node_modules"
+          chown -R nodered "$NODE_RED_HOME"
 
-            export NODE_RED_HOME=${cfg.userDir}
+          exec ${pkgs.node-red}/bin/node-red \
+            --userDir "$NODE_RED_HOME" \
+            --port ${toString cfg.port}
+        '';
 
-            # ---- Guards -------------------------------------------------
-
-            mkdir -p "$NODE_RED_HOME"
-            mkdir -p "$NODE_RED_HOME/node_modules"
-
-            chown -R nodered "$NODE_RED_HOME"
-
-            # ---- Start Node-RED ----------------------------------------
-
-            exec ${pkgs.node-red}/bin/node-red \
-              --userDir "$NODE_RED_HOME" \
-              --port ${toString cfg.port}
-          ''
-        ];
-
-        UserName = "nodered";
-        RunAtLoad = true;
-        KeepAlive = true;
-
-        StandardOutPath = "/var/log/node-red.log";
-        StandardErrorPath = "/var/log/node-red.err";
+        serviceConfig = {
+          KeepAlive = true;
+          RunAtLoad = true;
+          StandardOutPath = "/var/log/node-red.log";
+          StandardErrorPath = "/var/log/node-red.err";
+          UserName = "nodered";
+        };
       };
-    };
   };
 }

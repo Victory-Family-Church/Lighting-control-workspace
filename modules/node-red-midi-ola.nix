@@ -10,7 +10,6 @@ in
     userDir = lib.mkOption {
       type = lib.types.path;
       default = "/var/lib/node-red";
-      description = "Persistent Node-RED user directory.";
     };
 
     port = lib.mkOption {
@@ -20,37 +19,45 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-  users.users.nodered = {
-    home = cfg.userDir;
-    createHome = true;
-    isHidden = true;
-  };
 
-    launchd.daemons = {
-      node-red = {
-        enable = true;
+    # Darwin user definition (no isSystemUser on macOS)
+    users.users.nodered = {
+      home = cfg.userDir;
+      createHome = true;
+      isHidden = true;
+    };
 
-        script = ''
-          set -e
-          export NODE_RED_HOME=${cfg.userDir}
+    # ✅ THIS is the entire allowed launchd definition
+    launchd.daemons.node-red = {
+      enable = true;
 
-          mkdir -p "$NODE_RED_HOME"
-          mkdir -p "$NODE_RED_HOME/node_modules"
-          chown -R nodered "$NODE_RED_HOME"
+      script = ''
+        set -e
 
-          exec ${pkgs.node-red}/bin/node-red \
-            --userDir "$NODE_RED_HOME" \
-            --port ${toString cfg.port}
-        '';
+        export NODE_RED_HOME=${cfg.userDir}
 
-        serviceConfig = {
-          KeepAlive = true;
-          RunAtLoad = true;
-          StandardOutPath = "/var/log/node-red.log";
-          StandardErrorPath = "/var/log/node-red.err";
-          UserName = "nodered";
-        };
+        mkdir -p "$NODE_RED_HOME"
+        mkdir -p "$NODE_RED_HOME/node_modules"
+        chown -R nodered "$NODE_RED_HOME"
+
+        exec ${pkgs.node-red}/bin/node-red \
+          --userDir "$NODE_RED_HOME" \
+          --port ${toString cfg.port}
+      '';
+
+      serviceConfig = {
+        KeepAlive = true;
+        RunAtLoad = true;
+        UserName = "nodered";
+        StandardOutPath = "/var/log/node-red.log";
+        StandardErrorPath = "/var/log/node-red.err";
       };
     };
+
+    # Darwin-only: allow broken OLA package
+    nixpkgs.config.problems.handlers =
+      lib.mkIf pkgs.stdenv.isDarwin {
+        ola.broken = "ignore";
+      };
   };
 }

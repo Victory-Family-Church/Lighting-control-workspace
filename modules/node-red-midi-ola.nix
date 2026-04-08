@@ -29,7 +29,6 @@ in
 
     # ✅ THIS is the entire allowed launchd definition
     launchd.daemons.node-red = {
-      enable = true;
 
       script = ''
         set -e

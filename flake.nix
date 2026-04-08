@@ -23,7 +23,7 @@
           src = prev.fetchurl {
             url =
               "https://registry.npmjs.org/node-red/-/node-red-${version}.tgz";
-            hash = "2n9nvkd5ds5jdkyry3c9m6v0djhfz22py89wd2dyz5xm5vmdrp376z2ni8138h0wwy3xg3agxcr62wj90xxhm98ll9gwfykhr704y71";
+            hash = "sha512-2n9nvkd5ds5jdkyry3c9m6v0djhfz22py89wd2dyz5xm5vmdrp376z2ni8138h0wwy3xg3agxcr62wj90xxhm98ll9gwfykhr704y71";
           };
         };
 
@@ -35,7 +35,7 @@
             src = prev.fetchurl {
               url =
                 "https://registry.npmjs.org/node-red-contrib-midi/-/node-red-contrib-midi-${version}.tgz";
-              hash = "2wrwaj7qln7parcxvicl4nd9bfckhflp11p2d022by1l8dbb2bzcpapqdi8q7lig5wipj440wjar01jnf41vci72vikbb7nzw7n06y3";
+              hash = "sha512-2wrwaj7qln7parcxvicl4nd9bfckhflp11p2d022by1l8dbb2bzcpapqdi8q7lig5wipj440wjar01jnf41vci72vikbb7nzw7n06y3";
             };
           };
 
@@ -47,7 +47,7 @@
             src = prev.fetchurl {
               url =
                 "https://registry.npmjs.org/node-red-contrib-ola/-/node-red-contrib-ola-${version}.tgz";
-              hash = "08889yyv7bjra5gsyknv1vqrwyjmx2xkl4yp226ijp6ns7nfzmzdqvk6m5g3zrgk1jm6qd54ipxqk35lfisxal51cqyqbkbk2c98vlf";
+              hash = "sha512-08889yyv7bjra5gsyknv1vqrwyjmx2xkl4yp226ijp6ns7nfzmzdqvk6m5g3zrgk1jm6qd54ipxqk35lfisxal51cqyqbkbk2c98vlf";
             };
           };
       };

@@ -20,12 +20,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-
-    users.users.nodered = {
-      isSystemUser = true;
-      home = cfg.userDir;
-      createHome = true;
-    };
+  users.users.nodered = {
+    home = cfg.userDir;
+    createHome = true;
+    isHidden = true;
+  };
 
     launchd.daemons.node-red = {
       enable = true;

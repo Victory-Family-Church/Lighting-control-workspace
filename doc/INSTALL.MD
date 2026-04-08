@@ -7,7 +7,7 @@
 # Import and validate Pro-Presenter presentation
 
 # Deploy lights flake output. 
-
+nix --extra-experimental-features "flakes nix-command"  build .#darwinConfigurations.lighting.system --no-write-lock-file
  # Adding Node‑RED Plugins (Contrib Nodes)
 
 Node‑RED plugins (also called “contrib nodes”) are installed into the

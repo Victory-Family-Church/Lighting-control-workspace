@@ -1,85 +1,62 @@
 { config, lib, pkgs, ... }:
 
 let
-  cfg = config.services.nodeRedMidiOla;
-
-  contribNodes = [
-    pkgs.node-red-contrib-midi
-    pkgs.node-red-contrib-ola
-  ];
-
-  linkContribNodes = ''
-    mkdir -p "$NODE_RED_HOME/node_modules"
-    for pkg in ${lib.concatStringsSep " " (map toString contribNodes)}; do
-      ln -sfn "$pkg/lib/node_modules/$(basename "$pkg")" \
-        "$NODE_RED_HOME/node_modules/$(basename "$pkg")"
-    done
-  '';
+  cfg = config.services.nodeRed;
 in
 {
-  options.services.nodeRedMidiOla = {
-    enable = lib.mkEnableOption "Node-RED with MIDI + OLA blocks";
+  options.services.nodeRed = {
+    enable = lib.mkEnableOption "Node-RED service";
+
+    userDir = lib.mkOption {
+      type = lib.types.path;
+      default = "/var/lib/node-red";
+      description = "Persistent Node-RED user directory.";
+    };
 
     port = lib.mkOption {
       type = lib.types.port;
       default = 1880;
     };
-
-    user = lib.mkOption {
-      type = lib.types.str;
-      default = "nodered";
-    };
-
-    dataDir = lib.mkOption {
-      type = lib.types.path;
-      default = "/var/lib/node-red";
-    };
   };
 
   config = lib.mkIf cfg.enable {
 
-    users.users.${cfg.user} = {
-      home = cfg.dataDir;
+    users.users.nodered = {
+      isSystemUser = true;
+      home = cfg.userDir;
       createHome = true;
-      isHidden = true;
     };
 
-    environment.systemPackages = [
-      pkgs.nodejs_20
-      pkgs.nodejs.pkgs.node-red
-      pkgs.nodejs.pkgs.node-red-contrib-midi
-      pkgs.nodejs.pkgs.node-red-contrib-ola
-    ];
-
-    launchd.daemons.node-red-midi-ola = {
+    launchd.daemons.node-red = {
       enable = true;
 
       config = {
-        Label = "org.nixos.node-red-midi-ola";
+        Label = "org.vfc.node-red";
 
         ProgramArguments = [
-          "${pkgs.nodejs_20}/bin/node"
-          "${pkgs.nodePackages.node-red}/lib/node_modules/node-red/red.js"
-          "--userDir"
-          cfg.dataDir
-          "--port"
-          (toString cfg.port)
+          "/bin/sh"
+          "-c"
+          ''
+            set -e
+
+            export NODE_RED_HOME=${cfg.userDir}
+
+            # ---- Guards -------------------------------------------------
+
+            mkdir -p "$NODE_RED_HOME"
+            mkdir -p "$NODE_RED_HOME/node_modules"
+
+            chown -R nodered "$NODE_RED_HOME"
+
+            # ---- Start Node-RED ----------------------------------------
+
+            exec ${pkgs.node-red}/bin/node-red \
+              --userDir "$NODE_RED_HOME" \
+              --port ${toString cfg.port}
+          ''
         ];
 
-        EnvironmentVariables = {
-          NODE_RED_HOME = cfg.dataDir;
-          NODE_PATH = lib.makeSearchPath "lib/node_modules" [
-            pkgs.nodePackages.node-red
-            pkgs.nodePackages.node-red-contrib-midi
-            pkgs.nodePackages.node-red-contrib-ola
-          ];
-        };
-
-        UserName = cfg.user;
-        GroupName = "staff";
-
-        WorkingDirectory = cfg.dataDir;
-
+        UserName = "nodered";
         RunAtLoad = true;
         KeepAlive = true;
 

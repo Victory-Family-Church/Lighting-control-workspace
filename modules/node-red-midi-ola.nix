@@ -54,10 +54,5 @@ in
       };
     };
 
-    # Darwin-only: allow broken OLA package
-    nixpkgs.config.problems.handlers =
-      lib.mkIf pkgs.stdenv.isDarwin {
-        ola.broken = "ignore";
-      };
   };
 }

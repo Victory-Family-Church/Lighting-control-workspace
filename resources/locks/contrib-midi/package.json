@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "node-red-contrib-midi": "^1.1.2"
+  }
+}

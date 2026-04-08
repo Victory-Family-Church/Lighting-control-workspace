@@ -2,6 +2,19 @@
 
 let
   cfg = config.services.nodeRedMidiOla;
+
+  contribNodes = [
+    pkgs.node-red-contrib-midi
+    pkgs.node-red-contrib-ola
+  ];
+
+  linkContribNodes = ''
+    mkdir -p "$NODE_RED_HOME/node_modules"
+    for pkg in ${lib.concatStringsSep " " (map toString contribNodes)}; do
+      ln -sfn "$pkg/lib/node_modules/$(basename "$pkg")" \
+        "$NODE_RED_HOME/node_modules/$(basename "$pkg")"
+    done
+  '';
 in
 {
   options.services.nodeRedMidiOla = {

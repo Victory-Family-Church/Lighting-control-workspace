@@ -38,6 +38,42 @@
           runHook postInstall
           '';
       };
+      node-red-contrib-midi = prev.buildNpmPackage rec {
+          pname = "node-red-contrib-midi";
+          version = "1.1.2";
+
+          src = final.fetchurl {
+            url = "https://registry.npmjs.org/node-red-contrib-midi/-/node-red-contrib-midi-${version}.tgz";
+            hash = "sha256-R4f67TUP+9MaJ1fE6E2AX3Gp+CQ8ELKAWXT5XjzDUPE==";
+          };
+        # Vendored lockfile (committed to this repo)
+        npmLock = ./resources/locks/node-red/package-lock.json;
+
+        # Fill this once with the value Nix prints on first build
+        npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        postPatch = ''    cp ${./resources/locks/node-red/package-lock.json} package-lock.json  '';
+        dontNpmBuild = true;
+
+        };
+
+        node-red-contrib-ola = prev.buildNpmPackage rec {
+          pname = "node-red-contrib-ola";
+          version = "0.0.4";
+
+          src = final.fetchurl {
+            url = "https://registry.npmjs.org/node-red-contrib-ola/-/node-red-contrib-ola-${version}.tgz";
+            hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+          };
+
+        # Vendored lockfile (committed to this repo)
+        npmLock = ./resources/locks/node-red/package-lock.json;
+
+        # Fill this once with the value Nix prints on first build
+        npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        postPatch = ''    cp ${./resources/locks/node-red/package-lock.json} package-lock.json  '';
+        dontNpmBuild = true;
+
+        };
     };
   in
   {
@@ -46,6 +82,9 @@
     ##########################################################################
     overlays.default = overlay;
     packages.aarch64-darwin.node-red =  let    pkgs = import nixpkgs {      system = "aarch64-darwin";      overlays = [ overlay ];    };  in  pkgs.node-red;
+    packages.aarch64-darwin.node-red-contrib-ola =  let    pkgs = import nixpkgs {      system = "aarch64-darwin";      overlays = [ overlay ];    };  in  pkgs.node-red-contrib-ola;
+    packages.aarch64-darwin.node-red-contrib-midi =  let    pkgs = import nixpkgs {      system = "aarch64-darwin";      overlays = [ overlay ];    };  in  pkgs.node-red-contrib-midi;
+
     ##########################################################################
     # nix-darwin module (overlay auto-applied)
     ##########################################################################

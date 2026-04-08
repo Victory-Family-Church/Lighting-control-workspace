@@ -23,7 +23,7 @@ in
     # Darwin user definition (no isSystemUser on macOS)
     users.users.nodered = {
       uid = 300;  
-      gid = 20
+      gid = 20;
       home = cfg.userDir;
       createHome = true;
       isHidden = true;

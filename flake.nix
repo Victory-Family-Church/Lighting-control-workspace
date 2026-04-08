@@ -24,7 +24,6 @@ overlay = final: prev: {
 
     npmLock = ./resources/locks/node-red/package-lock.json;
     npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-
     dontNpmBuild = true;
 
     installPhase = ''

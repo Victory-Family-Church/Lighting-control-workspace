@@ -26,8 +26,8 @@ in
     isHidden = true;
   };
 
-    launchd.daemons.node-red = {
-      launchd.daemons.node-red = {
+    launchd.daemons = {
+      node-red = {
         enable = true;
 
         script = ''

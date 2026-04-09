@@ -23,3 +23,21 @@ NODE-RED is installed from NPM.
 [Install NODE-RED](./NODE-RED.MD)
 
 # Configure Pro-Presenter
+
+Now that we have all of the software installed- propresenter needs to know what to do.  
+- Hit `command` + `,` to open settings
+- Navigate to the `Devices` settings page (Image Below)  
+- Select `Add Device (+)` > MIDI
+- Checkmark `Bus 1` (Restart propresenter if it doesn't show up- example below)
+
+![](./IMG/Screenshot%202026-04-09%20at%2012.49.28.png)
+
+![](./IMG/Screenshot%202026-04-09%20at%2012.52.34.png)
+
+# Controlling Lights
+Lights can now be controlled via `slides` or `macros`.  
+## Slides
+If using slides to control lights, there is an [example presentation](/resources/ProPresenter/LIGHT%20CONTROL.pro).  
+- Download and import
+- Update the slide actions to target the correct midi device
+![](./IMG/Screenshot%202026-04-09%20at%2012.59.24.png)

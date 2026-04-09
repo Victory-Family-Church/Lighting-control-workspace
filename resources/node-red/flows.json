@@ -2,7 +2,7 @@
     {
         "id": "27e20b15cee21fc4",
         "type": "tab",
-        "label": "Flow 1",
+        "label": "Lighting-control",
         "disabled": false,
         "info": "",
         "env": []
@@ -43,12 +43,10 @@
         "wires": [
             [],
             [
-                "a8f41e826110c192",
-                "b3fd142384b13ebf"
+                "a8f41e826110c192"
             ],
             [
-                "143a7a7b673ae6e6",
-                "5bccbd4c11a7f292"
+                "143a7a7b673ae6e6"
             ],
             []
         ]
@@ -57,14 +55,15 @@
         "id": "89e7d0bfd6742566",
         "type": "midi in",
         "z": "27e20b15cee21fc4",
-        "name": "",
+        "name": "Midi In",
         "midiport": "0",
-        "x": 530,
+        "x": 330,
         "y": 1100,
         "wires": [
             [
                 "6c95cc58c8a02f65",
-                "3a50f619f08b889e"
+                "3a50f619f08b889e",
+                "34c3a066d0f38336"
             ]
         ]
     },
@@ -73,11 +72,16 @@
         "type": "debug",
         "z": "27e20b15cee21fc4",
         "name": "noteon",
-        "active": true,
-        "console": "false",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
         "complete": "payload",
-        "x": 820,
-        "y": 860,
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 1260,
         "wires": []
     },
     {
@@ -97,52 +101,17 @@
         "type": "debug",
         "z": "27e20b15cee21fc4",
         "name": "",
-        "active": true,
-        "console": "false",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": false,
         "complete": "midi",
-        "x": 620,
-        "y": 1160,
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 1280,
         "wires": []
-    },
-    {
-        "id": "b3fd142384b13ebf",
-        "type": "function",
-        "z": "27e20b15cee21fc4",
-        "name": "Turn on Lights",
-        "func": "msg.payload = {\n    \"transition\": \"fade\",\n    \"time\": 300,\n    \"channels\": [\n        {\n            \"channel\": 1,\n            \"value\": 255\n        },\n        {\n            \"channel\": 2,\n            \"value\": 255\n        },\n        {\n            \"channel\": 3,\n            \"value\": 255\n        },\n        {\n            \"channel\": 4,\n            \"value\": 255\n        }    ]\n}\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1060,
-        "y": 900,
-        "wires": [
-            [
-                "d9916ec7cd864ac2"
-            ]
-        ]
-    },
-    {
-        "id": "5bccbd4c11a7f292",
-        "type": "function",
-        "z": "27e20b15cee21fc4",
-        "name": "Turn off lights",
-        "func": "msg.payload = {\n    \"transition\": \"fade\",\n    \"time\": 300,\n    \"channels\": [\n        {\n            \"channel\": 1,\n            \"value\": 0\n        },\n        {\n            \"channel\": 2,\n            \"value\": 0\n        },\n        {\n            \"channel\": 3,\n            \"value\": 0\n        },\n        {\n            \"channel\": 4,\n            \"value\": 0\n        }]\n}\n\nreturn msg;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1060,
-        "y": 1120,
-        "wires": [
-            [
-                "d9916ec7cd864ac2"
-            ]
-        ]
     },
     {
         "id": "d9916ec7cd864ac2",
@@ -158,7 +127,65 @@
         "wires": []
     },
     {
-        "id": "bf054f1f96b8bf26",
+        "id": "34c3a066d0f38336",
+        "type": "function",
+        "z": "27e20b15cee21fc4",
+        "name": "function 1",
+        "func": "function scale(value, inMin, inMax, outMin, outMax) {\n    const result = (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;\n\n    if (result < outMin) {\n        return outMin;\n    } else if (result > outMax) {\n        return outMax;\n    }\n\n    return result;\n}\n\nmsg.payload = scale(msg.midi.data[1], 0, 127, 0, 255);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 940,
+        "wires": [
+            [
+                "db2e17e915496b16",
+                "c8e338f0c026bcdf"
+            ]
+        ]
+    },
+    {
+        "id": "db2e17e915496b16",
+        "type": "debug",
+        "z": "27e20b15cee21fc4",
+        "name": "Scale Value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1050,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "c8e338f0c026bcdf",
+        "type": "function",
+        "z": "27e20b15cee21fc4",
+        "name": "function 2",
+        "func": "msg.payload = {\n    \"transition\": \"fade\",\n    \"time\": 500,\n    \"channels\": [\n        {\n            \"channel\": 1,\n            \"value\": msg.payload\n        },\n        {\n            \"channel\": 2,\n            \"value\": msg.payload\n        },\n        {\n            \"channel\": 3,\n            \"value\": msg.payload\n        },\n        {\n            \"channel\": 4,\n            \"value\": msg.payload\n        }]\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 980,
+        "y": 1040,
+        "wires": [
+            [
+                "d9916ec7cd864ac2"
+            ]
+        ]
+    },
+    {
+        "id": "1a894fd13290d02b",
         "type": "global-config",
         "env": [],
         "modules": {
